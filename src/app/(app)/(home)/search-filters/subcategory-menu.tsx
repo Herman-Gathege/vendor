@@ -16,15 +16,14 @@ export const SubcategoryMenu = ({ category, isOpen, position, }: Props) => {
     return null;
   }
 
-  const backgroundColor = category.color || "f5f5f5";
+  const backgroundColor = category.color || "#f5f5f5";
 
   return (
     <div
-      className="fixed z-100"
+      className="fixed z-50"
       style={{
         top: position?.top,
         left: position?.left,
-        // zIndex: 1000,
       }}
     >
       {/* invisble bridge to maintain hover */}

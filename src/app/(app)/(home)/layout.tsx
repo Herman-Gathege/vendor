@@ -44,6 +44,16 @@ const Layout = async ({ children }: Props) => {
 }));
 
 
+//TRY THIS FORMAT
+//  const formattedData = data.docs.map((doc) => ({
+//     ...doc,
+//     subcategories: (doc.subcategories?.docs ?? []).map((subDoc: Category) => ({
+//       ...subDoc,
+//       subcategories: undefined,
+//     })),
+//   }));
+
+
   console.log({ data, formattedData });
 
   return (
