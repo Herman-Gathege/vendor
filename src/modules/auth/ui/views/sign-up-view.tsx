@@ -22,9 +22,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,21 +31,23 @@ const poppins = Poppins({
 });
 
 export const SignUpView = () => {
-
   const router = useRouter();
 
-
   const trpc = useTRPC();
-  const register = useMutation(trpc.auth.register.mutationOptions({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSuccess: () => {
-      toast.success("Account created successfully");
-      router.push("/");
-    },
-  }));
+  const queryClient = useQueryClient();
+  const register = useMutation(
+    trpc.auth.register.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
 
+        toast.success("Account created successfully");
+        router.push("/");
+      },
+    })
+  );
 
   const form = useForm<z.infer<typeof registerSchema>>({
     mode: "all",
@@ -129,7 +130,7 @@ export const SignUpView = () => {
                   <FormControl>
                     <Input placeholder="Email" {...field} />
                   </FormControl>
-                  
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -143,16 +144,21 @@ export const SignUpView = () => {
                   <FormControl>
                     <Input placeholder="Password" {...field} type="password" />
                   </FormControl>
-                  
+
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button disabled={register.isPending} type="submit" size="lg" variant="elevated" className="bg-black text-white hover:bg-pink-400 hover:text-primary">
+            <Button
+              disabled={register.isPending}
+              type="submit"
+              size="lg"
+              variant="elevated"
+              className="bg-black text-white hover:bg-pink-400 hover:text-primary"
+            >
               Create Account
             </Button>
-
           </form>
         </Form>
       </div>

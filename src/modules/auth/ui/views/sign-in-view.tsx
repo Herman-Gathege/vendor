@@ -21,9 +21,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,21 +30,22 @@ const poppins = Poppins({
 });
 
 export const SignInView = () => {
-
   const router = useRouter();
 
-
   const trpc = useTRPC();
-  const login = useMutation(trpc.auth.login.mutationOptions({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSuccess: () => {
-      toast.success("Welcome");
-      router.push("/");
-    },
-  }));
-
+  const queryClient = useQueryClient();
+  const login = useMutation(
+    trpc.auth.login.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
+        toast.success("Welcome");
+        router.push("/");
+      },
+    })
+  );
 
   const form = useForm<z.infer<typeof loginSchema>>({
     mode: "all",
@@ -96,11 +96,8 @@ export const SignInView = () => {
                 </Link>
               </Button>
             </div>
-            <h1 className="text-4xl font-medium">
-              Welcome back to Vendor!
-            </h1>
+            <h1 className="text-4xl font-medium">Welcome back to Vendor!</h1>
 
-            
             <FormField
               name="email"
               render={({ field }) => (
@@ -109,7 +106,7 @@ export const SignInView = () => {
                   <FormControl>
                     <Input placeholder="Email" {...field} />
                   </FormControl>
-                  
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -123,16 +120,21 @@ export const SignInView = () => {
                   <FormControl>
                     <Input placeholder="Password" {...field} type="password" />
                   </FormControl>
-                  
+
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button disabled={login.isPending} type="submit" size="lg" variant="elevated" className="bg-black text-white hover:bg-pink-400 hover:text-primary">
+            <Button
+              disabled={login.isPending}
+              type="submit"
+              size="lg"
+              variant="elevated"
+              className="bg-black text-white hover:bg-pink-400 hover:text-primary"
+            >
               Login
             </Button>
-
           </form>
         </Form>
       </div>
