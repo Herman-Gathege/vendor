@@ -10,6 +10,16 @@ import { Button } from "@/components/ui/button";
 import { LinkIcon, StarIcon } from "lucide-react";
 import { Fragment } from "react";
 import { Progress } from "@/components/ui/progress";
+// import { CartButton } from "../components/cart-button";
+import dynamic from "next/dynamic";
+
+const CartButton = dynamic(
+  () => import("../components/cart-button").then((mod) => mod.CartButton),
+  {
+    ssr: false,
+    loading: () => <Button disabled className="flex-1 bg-pink-400">Add to Cart</Button>,
+  }
+);
 
 interface ProductViewProps {
   productId: string;
@@ -86,55 +96,48 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
           </div>
 
           <div className="col-span-2 ">
-              <div className="border-t lg:border-t-0 lg:border-l h-full">
-                <div className="flex flex-col gap-4 p-6 border-b">
-                  <div className="flex flex-row items-center gap-2">
-                   <Button
-                   variant="elevated"
-                   className="flex-1 bg-pink-400"
-                   >
-                    Add to Cart
-                   </Button>
-                   <Button
-                   variant="elevated"
-                   className="size-12"
-                   onClick={()=> {}}
-                   disabled= {false}
-                   >
-                   <LinkIcon/>
-                   </Button>
-                  </div>
-                  <p className="text-center font-medium">
-                    {data.refundPolicy === "no-refund"
-                      ? "No Refunds"
-                      : `${data.refundPolicy} money back guarantee`
-                    }
-                  </p>
+            <div className="border-t lg:border-t-0 lg:border-l h-full">
+              <div className="flex flex-col gap-4 p-6 border-b">
+                <div className="flex flex-row items-center gap-2">
+                  <CartButton productId={productId} tenantSlug={tenantSlug} />
+                  <Button
+                    variant="elevated"
+                    className="size-12"
+                    onClick={() => {}}
+                    disabled={false}
+                  >
+                    <LinkIcon />
+                  </Button>
                 </div>
+                <p className="text-center font-medium">
+                  {data.refundPolicy === "no-refund"
+                    ? "No Refunds"
+                    : `${data.refundPolicy} money back guarantee`}
+                </p>
+              </div>
 
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-medium">Ratings</h3>
-                    <div className="flex items-center gap-x-1 font-medium">
-                      <StarIcon className="size-4 fill-black" />
-                      <p>({4})</p>
-                      <p className="text-base">{5} ratings</p>
-                    </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-medium">Ratings</h3>
+                  <div className="flex items-center gap-x-1 font-medium">
+                    <StarIcon className="size-4 fill-black" />
+                    <p>({4})</p>
+                    <p className="text-base">{5} ratings</p>
                   </div>
-                  <div className="grid grid-cols-[auto_1fr_auto] gap-3 mt-4">
-                    {[5, 4, 3, 2, 1].map((stars) => (
-                      <Fragment key={stars}>
-                        <div className="font-medium">{stars} {stars === 1 ? "star" : "stars"}</div>
-                        <Progress 
-                        value={84} 
-                        className="h-[1lh]"
-                        />
-                        <div className="font-medium">{89}%</div>
-                      </Fragment>
-                     ))}
-                  </div>
+                </div>
+                <div className="grid grid-cols-[auto_1fr_auto] gap-3 mt-4">
+                  {[5, 4, 3, 2, 1].map((stars) => (
+                    <Fragment key={stars}>
+                      <div className="font-medium">
+                        {stars} {stars === 1 ? "star" : "stars"}
+                      </div>
+                      <Progress value={84} className="h-[1lh]" />
+                      <div className="font-medium">{89}%</div>
+                    </Fragment>
+                  ))}
                 </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
