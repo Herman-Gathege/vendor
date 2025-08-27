@@ -37,7 +37,11 @@ export const Products: CollectionConfig = {
       type: "upload",
       relationTo: "media",
     },
-    
+    {
+      name: "cover",
+      type: "upload",
+      relationTo: "media",
+    },
     {
       name: "refundPolicy",
       type: "select",
